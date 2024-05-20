@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Data Entry Form</title>
+    <script>
+        function validateId(id) {
+            id = id.trim();
+            if (id.length !== 10) {
+                return "身份證號碼長度必須為10位";
+            }
+
+            // Check if first character is an English letter
+            if (!(/[A-Z]/.test(id[0]))) {
+                return "首字母必須為英文字母";
+            }
+
+            // Check if the rest are digits
+            if (!(/^\d+$/.test(id.slice(1)))) {
+                return "剩餘的字符必須為數字";
+            }
+
+            // Convert the first letter to corresponding number
+            let firstLetter = id.charCodeAt(0) - 'A'.charCodeAt(0) + 10;
+            id = String(firstLetter) + id.slice(1);
+
+            // Define weights for checksum calculation
+            let weights = [1, 9, 8, 7, 6, 5, 4, 3, 2, 1, 1];
+
+            // Calculate checksum
+            let sum = 0;
+            for (let i = 0; i < id.length; i++) {
+                sum += parseInt(id[i]) * weights[i];
+            }
+
+            // Check if the checksum is divisible by 10
+            let verification = sum % 10 === 0;
+
+            if (!verification) {
+                return "身份證號碼校驗失敗";
+            }
+
+            return ""; // No error
+        }
+
+        function handleSubmit(event) {
+            event.preventDefault();
+            const id = document.getElementById("id").value;
+            const errorDiv = document.getElementById("error");
+            const errorMessage = validateId(id);
+            if (errorMessage) {
+                errorDiv.textContent = errorMessage;
+            } else {
+                // Clear error message and proceed with form submission
+                errorDiv.textContent = "";
+                event.target.submit();
+            }
+        }
+    </script>
+</head>
+<body>
+    <h2>Data Entry Form</h2>
+    <form onsubmit="handleSubmit(event)">
+        <label for="id">Identification Number:</label><br>
+        <input type="text" id="id" name="id" maxlength="10"><br>
+        <div id="error" style="color: red;"></div> <!-- Error message placeholder -->
+        <label for="name">Name:</label><br>
+        <input type="text" id="name" name="name"><br>
+        <label for="gender">Gender:</label><br>
+        <select id="gender" name="gender">
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+        </select><br>
+        <label for="email">Email:</label><br>
+        <input type="email" id="email" name="email"><br>
+        <input type="submit" value="Submit">
+    </form>
+</body>
+</html>
